@@ -13,10 +13,11 @@ namespace pathtracer
 // Get a random float. Note that we need one "generator" per thread, or we
 // would need to lock everytime someone called randf().
 ///////////////////////////////////////////////////////////////////////////////
-std::mt19937 generators[24]; // Assuming no more than 24 cores
 float randf()
 {
-	return float(generators[omp_get_thread_num()]() / double(generators[omp_get_thread_num()].max()));
+	// One generator per worker, with no fixed limit on the number of CPU threads.
+	thread_local std::mt19937 generator(std::mt19937::default_seed + omp_get_thread_num());
+	return std::generate_canonical<float, 24>(generator);
 }
 
 ///////////////////////////////////////////////////////////////////////////

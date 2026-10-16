@@ -8,6 +8,10 @@ ParticleSystem::~ParticleSystem()
 {
 }
 
+void ParticleSystem::release_gpu_data()
+{
+}
+
 void ParticleSystem::init_gpu_data()
 {
 }

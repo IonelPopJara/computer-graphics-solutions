@@ -13,6 +13,9 @@
 #include <SDL.h>
 #include <SDL_syswm.h>
 #include <GL/glew.h>
+#ifdef LABHELPER_USE_MESA
+#include "mesa_window.h"
+#endif
 
 // Data
 static double g_Time = 0.0f;
@@ -407,6 +410,9 @@ void ImGui_ImplSdlGL3_Shutdown()
 
 void ImGui_ImplSdlGL3_NewFrame(SDL_Window* window)
 {
+#ifdef LABHELPER_USE_MESA
+    labhelper::prepareMesaFrame(window);
+#endif
 	if(!g_FontTexture)
 		ImGui_ImplSdlGL3_CreateDeviceObjects();
 
@@ -416,7 +422,12 @@ void ImGui_ImplSdlGL3_NewFrame(SDL_Window* window)
 	int w, h;
 	int display_w, display_h;
 	SDL_GetWindowSize(window, &w, &h);
+#ifdef LABHELPER_USE_MESA
+    display_w = w;
+    display_h = h;
+#else
 	SDL_GL_GetDrawableSize(window, &display_w, &display_h);
+#endif
 	io.DisplaySize = ImVec2((float)w, (float)h);
 	io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0,
 	                                    h > 0 ? ((float)display_h / h) : 0);

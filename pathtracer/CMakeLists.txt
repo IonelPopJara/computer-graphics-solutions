@@ -16,6 +16,16 @@ function(copy_embree_runtime target)
     endif()
 endfunction()
 
+# Homebrew's OpenMP runtime is keg-only. Help Apple Clang find it without global flags.
+if(APPLE)
+    if(POLICY CMP0074)
+        cmake_policy(SET CMP0074 NEW)
+    endif()
+    find_path(OpenMP_CXX_INCLUDE_DIR omp.h HINTS
+        "${OpenMP_ROOT}/include" "/opt/homebrew/opt/libomp/include" "/usr/local/opt/libomp/include")
+    find_library(OpenMP_libomp_LIBRARY NAMES omp HINTS
+        "${OpenMP_ROOT}/lib" "/opt/homebrew/opt/libomp/lib" "/usr/local/opt/libomp/lib")
+endif()
 find_package ( OpenMP REQUIRED COMPONENTS CXX )
 
 # Find *all* shaders.
@@ -46,11 +56,6 @@ target_link_libraries ( ${PROJECT_NAME} labhelper embree OpenMP::OpenMP_CXX )
 config_build_output()
 copy_embree_runtime(${PROJECT_NAME})
 
-if(BUILD_TESTING)
-    add_executable(pathtracer-embree-test tests/embree_test.cpp embree.cpp)
-    target_include_directories(pathtracer-embree-test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-    target_link_libraries(pathtracer-embree-test labhelper embree)
-    copy_windows_runtime(pathtracer-embree-test)
-    copy_embree_runtime(pathtracer-embree-test)
-    add_test(NAME pathtracer-embree COMMAND pathtracer-embree-test)
+if(BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
+    add_subdirectory(tests)
 endif()

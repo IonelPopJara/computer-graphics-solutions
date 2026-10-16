@@ -34,7 +34,7 @@ void restart()
 
 int getSampleCount()
 {
-	return std::max(rendered_image.number_of_samples - 1, 0);
+	return rendered_image.number_of_samples;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -43,8 +43,8 @@ int getSampleCount()
 ///////////////////////////////////////////////////////////////////////////
 void resize(int w, int h)
 {
-	rendered_image.width = w / settings.subsampling;
-	rendered_image.height = h / settings.subsampling;
+	rendered_image.width = std::max(w / settings.subsampling, 1);
+	rendered_image.height = std::max(h / settings.subsampling, 1);
 	rendered_image.data.resize(rendered_image.width * rendered_image.height);
 	restart();
 }
@@ -112,7 +112,7 @@ inline static glm::vec3 homogenize(const glm::vec4& p)
 void tracePaths(const glm::mat4& V, const glm::mat4& P)
 {
 	// Stop here if we have as many samples as we want
-	if((int(rendered_image.number_of_samples) > settings.max_paths_per_pixel)
+	if((int(rendered_image.number_of_samples) >= settings.max_paths_per_pixel)
 	   && (settings.max_paths_per_pixel != 0))
 	{
 		return;

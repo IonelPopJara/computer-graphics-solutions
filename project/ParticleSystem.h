@@ -24,6 +24,9 @@ public:
 
 	void init_gpu_data();
 
+	/// Release GPU resources while the graphics context is still current. Safe to call twice.
+	void release_gpu_data();
+
 	/// Creates a new particle if there less than `max_size` elements in the particles array buffer
 	void spawn(Particle particle);
 

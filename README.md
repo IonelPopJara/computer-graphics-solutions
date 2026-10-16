@@ -6,11 +6,21 @@ The accompanying web page to this repository is located at http://www.cse.chalme
 
 Instructions on how to use this repository specifically can be found at http://www.cse.chalmers.se/edu/course/TDA362/tutorials/start.html.
 
+## macOS
+
+For the Mesa software-rendering backend, see [README_MACOS.md](README_MACOS.md).
+On Apple Silicon Macs with macOS 15 or later, extract the whole repository and
+double-click **setup-macos.command**. Follow the installer prompts; if asked to
+install Apple's Command Line Tools, finish that installation and run setup again.
+Setup installs the tools and VS Code extensions, builds the labs, and opens
+VS Code. Select **lab1-rasterization** in **Run and Debug** and press **F5**.
+Errors are saved in `build/setup-macos.log`.
+
 ## VS Code
 
 On Windows x64, extract the whole repository and double-click
 **setup-windows.cmd**. It installs missing tools and the VS Code extensions,
-builds the labs, runs the Embree test, and opens the folder in VS Code.
+builds the labs, and opens the folder in VS Code.
 Approve the installers when Windows asks; if a restart is requested, restart
 and run setup again. Then choose **lab1-rasterization** in **Run and Debug**
 and press **F5**. Setup uses Windows App Installer (`winget`) to install VS Code,
@@ -45,20 +55,15 @@ The launch configurations set the working directory so relative shader and scene
 paths resolve correctly. Build files are generated in `build/`. The pathtracer uses
 Embree 4 and OpenMP and is included in the build and F5 configurations.
 On Windows, CMake finds `external/embree4` automatically and copies the required
-DLLs beside the executables in `bin/` and beside the test executable.
+DLLs beside the executables in `bin/`.
 
 To build from a Windows terminal with Visual Studio 2022 installed:
 
 ```powershell
 cmake -S . -B build -G "Visual Studio 17 2022" -A x64
 cmake --build build --config Debug
-ctest --test-dir build -C Debug --output-on-failure
 ```
 
 If an existing build directory uses a different generator or architecture,
 use a fresh build directory. Bundle provenance and license notices are in
 [external/embree4/BUNDLE.md](external/embree4/BUNDLE.md).
-
-After building all targets, run `ctest --test-dir build --output-on-failure`
-to check the Embree wrapper without a window or graphics context. Tests can be
-disabled at configure time with `-DBUILD_TESTING=OFF`.
