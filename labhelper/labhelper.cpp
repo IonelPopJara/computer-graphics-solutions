@@ -7,6 +7,10 @@
 #undef far
 #else
 #include <signal.h>
+#ifdef __APPLE__
+#include <sys/sysctl.h>
+#include <unistd.h>
+#endif
 #endif // WIN32
 
 #include <GL/glew.h>
@@ -18,6 +22,10 @@
 #include <stb_image_write.h>
 
 #include "labhelper.h"
+#include "gl_error.h"
+#ifdef LABHELPER_USE_MESA
+#include "mesa_window.h"
+#endif
 
 #include <cmath>
 #include <cstring>
@@ -60,6 +68,11 @@ SDL_Window* init_window_SDL(std::string caption, int width, int height)
 		return nullptr;
 	}
 	atexit(SDL_Quit);
+#ifdef LABHELPER_USE_MESA
+    SDL_Window* window = initMesaWindow(caption.c_str(), width, height);
+    if(!window)
+        fatal_error(SDL_GetError());
+#else
 	SDL_GL_LoadLibrary(nullptr); // Default OpenGL is fine.
 
 	// Request an OpenGL 4.1 context (should be core)
@@ -96,8 +109,14 @@ SDL_Window* init_window_SDL(std::string caption, int width, int height)
 		return nullptr;
 	}
 
-	// Initialize GLEW; this gives us access to OpenGL Extensions.
-	glewInit();
+#endif
+	// Initialize the loader for the context that is actually current.
+    glewExperimental = GL_TRUE;
+    GLenum glewStatus = glewInit();
+    if(glewStatus != GLEW_OK)
+        fatal_error(reinterpret_cast<const char*>(glewGetErrorString(glewStatus)));
+    // Some GLEW versions probe legacy extension strings on core contexts.
+    while(glGetError() != GL_NO_ERROR) {}
 
 	// Initialize ImGui; will allow us to edit variables in the application.
 	ImGui_ImplSdlGL3_Init(window);
@@ -109,9 +128,11 @@ SDL_Window* init_window_SDL(std::string caption, int width, int height)
 	// Flip textures vertically so they don't end up upside-down.
 	stbi_set_flip_vertically_on_load(true);
 
+#ifndef LABHELPER_USE_MESA
 	// 1 for v-sync
 	SDL_GL_SetSwapInterval(1);
 
+#endif
 	/* Workaround for AMD. It might no longer be necessary, but I dunno if we
 		* are ever going to remove it. (Consider it a piece of living history.)
 		*/
@@ -123,6 +144,15 @@ SDL_Window* init_window_SDL(std::string caption, int width, int height)
 	return window;
 }
 
+void swapWindow(SDL_Window* window)
+{
+#ifdef LABHELPER_USE_MESA
+    presentMesaWindow(window);
+#else
+    SDL_GL_SwapWindow(window);
+#endif
+}
+
 void shutDown(SDL_Window* window)
 {
 	// If newframe is not ever run before shut down we crash
@@ -131,6 +161,9 @@ void shutDown(SDL_Window* window)
 	//Destroy imgui
 	ImGui_ImplSdlGL3_Shutdown();
 
+#ifdef LABHELPER_USE_MESA
+    shutdownMesaWindow();
+#endif
 	//Destroy window
 	SDL_DestroyWindow(window);
 
@@ -214,11 +247,11 @@ bool checkGLError(const char* file, int line)
 	for(GLenum glErr = glGetError(); glErr != GL_NO_ERROR; glErr = glGetError())
 	{
 		wasError = true;
-		const GLubyte* sError = gluErrorString(glErr);
+		const char* sError = glErrorDescription(glErr);
 
 		if(!sError)
 		{
-			sError = reinterpret_cast<const GLubyte*>(" (no message available)");
+			sError = " (no message available)";
 		}
 
 		std::cerr << "GL Error #" << glErr << "(" << sError << ") "
@@ -375,6 +408,14 @@ namespace
 #if defined(_WIN32)
 			if(IsDebuggerPresent())
 				__debugbreak();
+#elif defined(__APPLE__)
+            // Match Windows: report errors when running normally, break when debugging.
+            int query[] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid() };
+            struct kinfo_proc process = {};
+            size_t size = sizeof(process);
+            if(sysctl(query, 4, &process, &size, nullptr, 0) == 0 &&
+               (process.kp_proc.p_flag & P_TRACED))
+                raise(SIGTRAP);
 #else  // !win32
 			raise(SIGTRAP);
 #endif // ~ platform
@@ -391,7 +432,7 @@ void setupGLDebugMessages()
 	CHECK_GL_ERROR();
 
 	// Make sure that we support this extension before attempting to do anything with it...
-	if(!glewIsExtensionSupported("GL_ARB_debug_output"))
+	if(!GLEW_VERSION_4_3 && !GLEW_KHR_debug)
 	{
 		printf(" --- \n");
 		printf(" --- \n");

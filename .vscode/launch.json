@@ -20,7 +20,8 @@
             ],
             "preLaunchTask": "CMake: build lab1-rasterization",
             "osx": {
-                "MIMode": "lldb"
+                "MIMode": "lldb",
+                "setupCommands": []
             },
             "windows": {
                 "type": "cppvsdbg",
@@ -53,7 +54,8 @@
             ],
             "preLaunchTask": "CMake: build lab2-textures",
             "osx": {
-                "MIMode": "lldb"
+                "MIMode": "lldb",
+                "setupCommands": []
             },
             "windows": {
                 "type": "cppvsdbg",
@@ -86,7 +88,8 @@
             ],
             "preLaunchTask": "CMake: build lab3-camera",
             "osx": {
-                "MIMode": "lldb"
+                "MIMode": "lldb",
+                "setupCommands": []
             },
             "windows": {
                 "type": "cppvsdbg",
@@ -119,7 +122,8 @@
             ],
             "preLaunchTask": "CMake: build lab4-shading",
             "osx": {
-                "MIMode": "lldb"
+                "MIMode": "lldb",
+                "setupCommands": []
             },
             "windows": {
                 "type": "cppvsdbg",
@@ -152,7 +156,8 @@
             ],
             "preLaunchTask": "CMake: build lab5-rendertotexture",
             "osx": {
-                "MIMode": "lldb"
+                "MIMode": "lldb",
+                "setupCommands": []
             },
             "windows": {
                 "type": "cppvsdbg",
@@ -185,7 +190,8 @@
             ],
             "preLaunchTask": "CMake: build lab6-shadowmaps",
             "osx": {
-                "MIMode": "lldb"
+                "MIMode": "lldb",
+                "setupCommands": []
             },
             "windows": {
                 "type": "cppvsdbg",
@@ -218,7 +224,8 @@
             ],
             "preLaunchTask": "CMake: build project",
             "osx": {
-                "MIMode": "lldb"
+                "MIMode": "lldb",
+                "setupCommands": []
             },
             "windows": {
                 "type": "cppvsdbg",
@@ -251,7 +258,8 @@
             ],
             "preLaunchTask": "CMake: build pathtracer",
             "osx": {
-                "MIMode": "lldb"
+                "MIMode": "lldb",
+                "setupCommands": []
             },
             "windows": {
                 "type": "cppvsdbg",

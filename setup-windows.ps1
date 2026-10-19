@@ -210,7 +210,6 @@ try {
     Invoke-Checked 'cmake.exe' @('-S', $projectDirectory, '-B', (Join-Path $projectDirectory 'build'),
         '-G', $generator, '-A', 'x64', "-DCMAKE_GENERATOR_INSTANCE=$($cppTools.installationPath)")
     Invoke-Checked 'cmake.exe' @('--build', (Join-Path $projectDirectory 'build'), '--config', 'Debug', '--parallel', '2')
-    Invoke-Checked 'ctest.exe' @('--test-dir', (Join-Path $projectDirectory 'build'), '-C', 'Debug', '--output-on-failure')
     Write-Host 'Setup complete. In VS Code, open Run and Debug, select lab1-rasterization, and press F5.'
     Write-Host 'If VS Code was already open during setup, close all its windows and reopen the project to refresh its tools.'
     if (-not $NoLaunch) { Invoke-Checked 'code.cmd' @('--new-window', $projectDirectory) }

@@ -2,6 +2,10 @@ cmake_minimum_required ( VERSION 3.10 )
 
 project ( computer-graphics-labs )
 include(CTest)
+
+# Apple's native OpenGL driver cannot run the labs' OpenGL 4.5 code.
+option(LABHELPER_USE_MESA "Render with Mesa llvmpipe and present through SDL" ${APPLE})
+option(LABS_BUILD_PATHTRACER "Build the pathtracer (requires Embree 4 and OpenMP)" ON)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "" FORCE)
@@ -66,5 +70,7 @@ add_subdirectory ( lab3-camera )
 add_subdirectory ( lab4-shading )
 add_subdirectory ( lab5-rendertotexture )
 add_subdirectory ( lab6-shadowmaps )
-add_subdirectory ( pathtracer )
+if(LABS_BUILD_PATHTRACER)
+    add_subdirectory ( pathtracer )
+endif()
 add_subdirectory ( project )

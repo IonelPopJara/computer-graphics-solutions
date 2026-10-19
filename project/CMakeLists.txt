@@ -24,3 +24,7 @@ add_executable ( ${PROJECT_NAME}
 
 target_link_libraries ( ${PROJECT_NAME} labhelper )
 config_build_output()
+
+if(LABHELPER_USE_MESA AND BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
+    add_subdirectory(tests)
+endif()
