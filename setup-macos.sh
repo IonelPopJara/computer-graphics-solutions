@@ -1,5 +1,10 @@
 #!/bin/bash
 # Guided setup for Apple Silicon Macs. Compatible with macOS's Bash 3.2.
+# A student may invoke this file with sh, which puts macOS Bash in POSIX mode.
+# Restart before that shell reaches Bash-only syntax such as process substitution.
+if [ -z "${BASH_VERSION:-}" ] || shopt -oq posix; then
+    exec /bin/bash "$0" "$@"
+fi
 set -euo pipefail
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
@@ -86,9 +91,29 @@ save_brew_path() {
 
 install_cpp_tools() {
     if have_cpp_tools; then echo "Apple C++ tools: already installed"; return; fi
-    echo "Apple's Command Line Tools are needed. Approve the installer that opens."
+    local answer
+    echo "Apple's Command Line Tools need to be installed before setup can continue."
+    echo "This is a normal first-time setup step, not an error."
+    echo "Click Install in the macOS installer dialog (it may be behind Terminal)."
     xcode-select --install || true
-    fail "Finish installing Command Line Tools, then run setup again. Existing files are kept."
+    while true; do
+        echo "Leave this Terminal window open while the installation finishes."
+        if ! read -r -p "When it has finished, press Return to continue (or type q to stop): " answer; then
+            echo "Setup paused. Run setup again when the Command Line Tools are installed."
+            exit 0
+        fi
+        case "$answer" in
+            q|Q)
+                echo "Setup paused. Run setup again when you are ready."
+                exit 0
+                ;;
+        esac
+        if have_cpp_tools; then
+            echo "Apple C++ tools: installed. Continuing setup..."
+            return
+        fi
+        echo "The Command Line Tools are not ready yet. Finish the installer, then return here."
+    done
 }
 
 install_homebrew() {

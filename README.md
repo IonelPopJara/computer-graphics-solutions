@@ -11,7 +11,8 @@ Instructions on how to use this repository specifically can be found at http://w
 For the Mesa software-rendering backend, see [README_MACOS.md](README_MACOS.md).
 On Apple Silicon Macs with macOS 15 or later, extract the whole repository and
 double-click **setup-macos.command**. Follow the installer prompts; if asked to
-install Apple's Command Line Tools, finish that installation and run setup again.
+install Apple's Command Line Tools, finish that installation and press Return
+in the setup window to continue.
 Setup installs the tools and VS Code extensions, builds the labs, and opens
 VS Code. Select **lab1-rasterization** in **Run and Debug** and press **F5**.
 Errors are saved in `build/setup-macos.log`.

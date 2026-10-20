@@ -19,8 +19,10 @@ extensions, builds the labs, and opens the course folder in VS Code. Follow the
 installer prompts. The first run can download several GB and take several
 minutes. Homebrew installation may ask for your Mac password (typing
 it in Terminal does not display characters). If Apple's Command Line Tools are
-missing, setup opens their installer. Finish that installation, then double-click
-**setup-macos.command** again.
+missing, setup opens their installer and waits. Finish the installation, then
+press **Return** in the setup Terminal window to continue. If you press Return
+too early, setup checks the tools and keeps waiting. Type `q` to stop and resume
+later by running setup again.
 
 In VS Code, trust the course folder if asked. Open **Run and Debug**, select
 **lab1-rasterization**, and press **F5**.
@@ -44,7 +46,6 @@ bash setup-macos.sh --check-only
 ```
 
 Use `bash setup-macos.sh --no-launch` to run setup without opening VS Code.
-The older `bash setup-macos-mesa.sh` command forwards to the same setup.
 
 Setup installs CMake, SDL2, GLM, Mesa, Embree, and OpenMP through Homebrew.
 Homebrew installs precompiled packages when available, including Mesa and its

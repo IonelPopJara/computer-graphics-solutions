@@ -24,10 +24,10 @@ if(LABHELPER_USE_MESA)
     find_library(MESA_GL_LIBRARY GL HINTS "${MESA_ROOT}/lib"
         /opt/homebrew/opt/mesa/lib /usr/local/opt/mesa/lib NO_DEFAULT_PATH)
     if(NOT MESA_INCLUDE_DIR OR NOT MESA_EGL_LIBRARY OR NOT MESA_GL_LIBRARY)
-        message(FATAL_ERROR "Mesa EGL/OpenGL was not found. Run setup-macos-mesa.sh (brew install mesa).")
+        message(FATAL_ERROR "Mesa EGL/OpenGL was not found. Run setup-macos.sh (brew install mesa).")
     endif()
     if(NOT EXISTS "${GLEW_MESA_ROOT}/src/glew.c")
-        message(FATAL_ERROR "Run setup-macos-mesa.sh to download the GLEW loader source, or set GLEW_MESA_ROOT.")
+        message(FATAL_ERROR "Run setup-macos.sh to download the GLEW loader source, or set GLEW_MESA_ROOT.")
     endif()
     # The Homebrew GLEW binary resolves Apple's entry points; use EGL for Mesa.
     # GLEW 2.2 accidentally excludes EGL's extension helpers on Apple.
