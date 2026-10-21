@@ -297,6 +297,14 @@ namespace
 	/// Callback function. This function is called by GL
 	/// whenever it generates a debug message.
 	///////////////////////////////////////////////////////////////////////////
+	// Keep this frame visible when a GL error traps, even in optimized builds.
+#if defined(_MSC_VER)
+#pragma optimize("", off)
+#elif defined(__clang__)
+	__attribute__((optnone, noinline))
+#elif defined(__GNUC__)
+	__attribute__((optimize("O0"), noinline))
+#endif
 	GLvoid CALLBACK_ handle_debug_message_(GLenum aSource,
 	                                       GLenum aType,
 	                                       GLuint aId,
@@ -421,6 +429,10 @@ namespace
 #endif // ~ platform
 		}
 	}
+
+#if defined(_MSC_VER)
+#pragma optimize("", on)
+#endif
 
 	// cleanup macros
 #undef CALLBACK_
