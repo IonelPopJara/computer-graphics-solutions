@@ -41,7 +41,7 @@ GLuint shaderProgram;
 
 // The vertexArrayObject here will hold the pointers to
 // the vertex data (in positionBuffer) and color data per vertex (in colorBuffer)
-GLuint positionBuffer, colorBuffer, indexBuffer, vertexArrayObject, texCoordBuffer, texture;
+GLuint positionBuffer, positionBuffer2, colorBuffer, indexBuffer, vertexArrayObject, vertexArrayObject2, texCoordBuffer, texCoordBuffer2, texture, texture2;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This function is called once at the start of the program and never again
@@ -102,13 +102,45 @@ void initialize()
 	// Create the element array buffer object
 	///////////////////////////////////////////////////////////////////////////
 	const int indices[] = {
-			0, 1, 3, // Triangle 1
-			1, 2, 3	 // Triangle 2
+			0, 3, 2, // Triangle 1
+			2, 1, 0	 // Triangle 2
 	};
 	glGenBuffers(1, &indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, labhelper::array_length(indices) * sizeof(float), indices,
 							 GL_STATIC_DRAW);
+
+	// Task 7
+	glGenVertexArrays(1, &vertexArrayObject2);
+	glBindVertexArray(vertexArrayObject2);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer); // tell vao2 to use these indices
+
+	const float positions2[] = {
+			// X		Y			Z
+			5.0f, 0.0f, -30.0f,		// v0
+			-5.0f, 0.0f, -30.0f,	// v1
+			-5.0f, 10.0f, -30.0f, // v2
+			5.0f, 10.0f, -30.0f		// v3
+	};
+
+	glGenBuffers(1, &positionBuffer2);
+	glBindBuffer(GL_ARRAY_BUFFER, positionBuffer2);
+	glBufferData(GL_ARRAY_BUFFER, labhelper::array_length(positions2) * sizeof(float), positions2, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+	glEnableVertexAttribArray(0);
+
+	float texcoords2[] = {
+			1.0f, 1.0f, // (u, v) for v0
+			0.0f, 1.0f, // (u, v) for v1
+			0.0f, 0.0f, // (u, v) for v2
+			1.0f, 0.0f	// (u, v) for v3
+	};
+
+	glGenBuffers(1, &texCoordBuffer2);
+	glBindBuffer(GL_ARRAY_BUFFER, texCoordBuffer2);
+	glBufferData(GL_ARRAY_BUFFER, labhelper::array_length(texcoords2) * sizeof(float), texcoords2, GL_STATIC_DRAW);
+	glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+	glEnableVertexAttribArray(1);
 
 	// The loadShaderProgram and linkShaderProgam functions are defined in glutil.cpp and
 	// do exactly what we did in lab1 but are hidden for convenience
@@ -136,6 +168,23 @@ void initialize()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(image);
+
+	// Task 7
+	int w2, h2, comp2;
+	unsigned char *image2 = stbi_load("../scenes/textures/explosion.png", &w2, &h2, &comp2, STBI_rgb_alpha);
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w2, h2, 0, GL_RGBA, GL_UNSIGNED_BYTE, image2);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	stbi_image_free(image2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -157,7 +206,8 @@ void display(void)
 
 	// We disable backface culling for this tutorial, otherwise care must be taken with the winding order
 	// of the vertices. It is however a lot faster to enable culling when drawing large scenes.
-	glDisable(GL_CULL_FACE); // glEnable(GL_CULL_FACE);
+	// glDisable(GL_CULL_FACE); // glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE); // glEnable(GL_CULL_FACE);
 	// Disable depth testing
 	glDisable(GL_DEPTH_TEST);
 	// Set the shader program to use for this draw call
@@ -181,6 +231,15 @@ void display(void)
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	glBindVertexArray(vertexArrayObject);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	// Task 7
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+
+	glBindVertexArray(vertexArrayObject2);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	glUseProgram(0); // "unsets" the current shader program. Not really necessary.
